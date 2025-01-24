@@ -37,7 +37,7 @@ app.post("/signup", async (req, res) => {
     return;
   }
 
-  const hashedPassword = bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   await prismaClient.user.create({
     data: {
@@ -67,20 +67,19 @@ app.post("/signin", async (req, res) => {
   const user = await prismaClient.user.findFirst({
     where: {
       username,
-      password,
     },
   });
 
-  const comparePassword = bcrypt.compare(password, user.password);
-
-  if (!comparePassword) {
+  if (!user || !user.password) {
     res.status(403).json({
       message: "Unauthorized",
     });
     return;
   }
 
-  if (!user) {
+  const comparePassword = await bcrypt.compare(password, user.password);
+
+  if (!comparePassword) {
     res.status(403).json({
       message: "Unauthorized",
     });
@@ -129,6 +128,24 @@ app.post("/room", middleware, async (req: CustomRequest, res: Response) => {
     });
     console.error(error);
   }
+});
+
+app.get("/chats/:roomId", async (req, res) => {
+  const roomId = Number(req.params.roomId);
+
+  const messages = await prismaClient.chat.findFirst({
+    where: {
+      roomId: roomId,
+    },
+    orderBy: {
+      id: "desc",
+    },
+    take: 50,
+  });
+
+  res.json({
+    messages,
+  });
 });
 
 app.listen(3001);

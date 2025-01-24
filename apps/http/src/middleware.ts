@@ -9,13 +9,21 @@ export interface CustomRequest extends Request {
 export const middleware = (req: Request, res: Response, next: NextFunction) => {
   const authHeaders = req.headers["authorization"] ?? "";
 
-  if (!authHeaders) {
+  if (!authHeaders || !authHeaders.startsWith("Bearer ")) {
     return res.status(403).json({
-      message: "Unauthorized",
+      message: "No token provided",
     });
   }
 
-  const decoded = jwt.verify(authHeaders, JWT_SECRET) as JwtPayload;
+  const token = authHeaders.split(" ")[1];
+
+  if (!token) {
+    return res.status(403).json({
+      message: "No token provided",
+    });
+  }
+
+  const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
   if (decoded) {
     (req as CustomRequest).userId = decoded.userId;
