@@ -10,16 +10,64 @@ interface User {
   userId: string;
 }
 
-const users: User[] = [];
+class UserManager {
+  private static instance: UserManager;
+  private users: User[] = [];
 
-const checkUser = (token: string) => {
-  const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+  private constructor() {}
 
-  if (!decoded || !decoded.userId) {
-    return null;
+  public static getInstance(): UserManager {
+    if (!UserManager.instance) {
+      UserManager.instance = new UserManager();
+    }
+    return UserManager.instance;
   }
 
-  return decoded.userId;
+  public addUser(user: User) {
+    this.users.push(user);
+  }
+
+  public removeUser(ws: WebSocket) {
+    this.users = this.users.filter((user) => user.ws !== ws);
+  }
+
+  public getUsersByWebsocket(ws: WebSocket) {
+    return this.users.find((user) => user.ws === ws);
+  }
+
+  public getUsersByRoom(roomId: string) {
+    return this.users.filter((user) => user.rooms.includes(roomId));
+  }
+
+  public addRoomToUser(ws: WebSocket, roomId: string) {
+    const user = this.getUsersByWebsocket(ws);
+    if (user) {
+      user.rooms.push(roomId);
+    }
+  }
+
+  public removeRoomFromUser(ws: WebSocket, roomId: string) {
+    const user = this.getUsersByWebsocket(ws);
+    if (user) {
+      user.rooms = user.rooms.filter((x) => x !== roomId);
+    }
+  }
+}
+
+const userManager = UserManager.getInstance();
+
+const checkUser = (token: string) => {
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+
+    if (!decoded || !decoded.userId) {
+      return null;
+    }
+
+    return decoded.userId;
+  } catch (error) {
+    return null;
+  }
 };
 
 wss.on("connection", function connection(ws, request) {
@@ -34,9 +82,10 @@ wss.on("connection", function connection(ws, request) {
 
   if (!userId) {
     ws.close();
+    return;
   }
 
-  users.push({
+  userManager.addUser({
     userId,
     rooms: [],
     ws,
@@ -45,23 +94,23 @@ wss.on("connection", function connection(ws, request) {
   ws.on("message", function message(data) {
     const parsedData = JSON.parse(data as unknown as string);
 
-    if (parsedData.type === "join_room") {
-      const user = users.find((x) => x.ws === ws);
-      user?.rooms.push(parsedData.roomId);
+    try {
+      if (parsedData.type === "join_room") {
+        userManager.addRoomToUser(ws, parsedData.roomId);
+      }
+    } catch (error) {
+      console.error(error);
     }
 
     if (parsedData.type === "leave_room") {
-      const user = users.find((x) => x.ws === ws);
-      if (!user) {
-        return;
-      }
-      user.rooms = user?.rooms.filter((x) => x === parsedData.room);
+      userManager.removeRoomFromUser(ws, parsedData.roomId);
     }
 
     if (parsedData.type === "chat") {
       const roomId = parsedData.roomId;
       const message = parsedData.message;
 
+      const users = userManager.getUsersByRoom(roomId);
       users.forEach((user) => {
         if (user.rooms.includes(roomId)) {
           user.ws.send(
@@ -74,5 +123,8 @@ wss.on("connection", function connection(ws, request) {
         }
       });
     }
+  });
+  ws.on("close", () => {
+    userManager.removeUser(ws);
   });
 });
