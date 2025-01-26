@@ -14,88 +14,104 @@ const app = express();
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  const parsedData = SignupSchema.safeParse(req.body);
-  if (!parsedData.success) {
+  try {
+    const parsedData = SignupSchema.safeParse(req.body);
+    if (!parsedData.success) {
+      res.json({
+        message: "Incorrect inputs",
+      });
+      return;
+    }
+
+    const { email, password, username } = parsedData.data;
+
+    const existingUser = await prismaClient.user.findFirst({
+      where: {
+        email,
+      },
+    });
+
+    if (existingUser) {
+      res.status(409).json({
+        error: "User already exists",
+      });
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await prismaClient.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        username,
+      },
+    });
+
     res.json({
-      message: "Incorrect inputs",
+      message: "User created successfully",
+      status: 201,
     });
-    return;
-  }
-
-  const { email, password, username } = parsedData.data;
-
-  const existingUser = await prismaClient.user.findFirst({
-    where: {
-      email,
-    },
-  });
-
-  if (existingUser) {
-    res.status(409).json({
-      error: "User already exists",
+  } catch (error) {
+    console.error(error);
+    res.json({
+      message: "Error creating user",
+      status: 500,
     });
-    return;
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  await prismaClient.user.create({
-    data: {
-      email,
-      password: hashedPassword,
-      username,
-    },
-  });
-
-  res.json({
-    message: "User created successfully",
-    status: 201,
-  });
 });
 
 app.post("/signin", async (req, res) => {
-  const parsedData = SigninSchema.safeParse(req.body);
-  if (!parsedData.success) {
+  try {
+    const parsedData = SigninSchema.safeParse(req.body);
+    if (!parsedData.success) {
+      res.json({
+        message: "Incorrect inputs",
+      });
+      return;
+    }
+
+    const { username, password } = parsedData.data;
+
+    const user = await prismaClient.user.findFirst({
+      where: {
+        username,
+      },
+    });
+
+    if (!user || !user.password) {
+      res.status(403).json({
+        message: "Unauthorized",
+      });
+      return;
+    }
+
+    const comparePassword = await bcrypt.compare(password, user.password);
+
+    if (!comparePassword) {
+      res.status(403).json({
+        message: "Unauthorized",
+      });
+      return;
+    }
+
+    const token = jwt.sign(
+      {
+        userId: user.id,
+      },
+      JWT_SECRET
+    );
+
     res.json({
-      message: "Incorrect inputs",
+      token,
     });
-    return;
-  }
-
-  const { username, password } = parsedData.data;
-
-  const user = await prismaClient.user.findFirst({
-    where: {
-      username,
-    },
-  });
-
-  if (!user || !user.password) {
-    res.status(403).json({
-      message: "Unauthorized",
+  } catch (error) {
+    console.error(error);
+    res.json({
+      message: "Error signing in",
+      status: 500,
     });
-    return;
   }
-
-  const comparePassword = await bcrypt.compare(password, user.password);
-
-  if (!comparePassword) {
-    res.status(403).json({
-      message: "Unauthorized",
-    });
-    return;
-  }
-
-  const token = jwt.sign(
-    {
-      userId: user.id,
-    },
-    JWT_SECRET
-  );
-
-  res.json({
-    token,
-  });
 });
 
 //@ts-ignore
@@ -133,7 +149,7 @@ app.post("/room", middleware, async (req: CustomRequest, res: Response) => {
 app.get("/chats/:roomId", async (req, res) => {
   const roomId = Number(req.params.roomId);
 
-  const messages = await prismaClient.chat.findFirst({
+  const messages = await prismaClient.chat.findMany({
     where: {
       roomId: roomId,
     },
@@ -145,6 +161,19 @@ app.get("/chats/:roomId", async (req, res) => {
 
   res.json({
     messages,
+  });
+});
+
+app.get("/room/:slug", async (req, res) => {
+  const slug = req.params.slug;
+  const room = await prismaClient.room.findFirst({
+    where: {
+      slug,
+    },
+  });
+
+  res.json({
+    room,
   });
 });
 
