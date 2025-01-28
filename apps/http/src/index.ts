@@ -9,9 +9,11 @@ import {
   SigninSchema,
 } from "@repo/common/types";
 import bcrypt from "bcryptjs";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.post("/signup", async (req, res) => {
   try {

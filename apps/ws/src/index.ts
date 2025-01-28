@@ -102,7 +102,6 @@ wss.on("connection", function connection(ws, request) {
 
     try {
       if (parsedData.type === "join_room") {
-        console.log(parsedData.roomId);
         userManager.addRoomToUser(ws, parsedData.roomId);
       }
     } catch (error) {
@@ -116,8 +115,6 @@ wss.on("connection", function connection(ws, request) {
     if (parsedData.type === "chat") {
       const roomId = parsedData.roomId;
       const message = parsedData.message;
-      console.log(roomId, message);
-      console.log(userId);
       await prismaClient.chat.create({
         data: {
           roomId: Number(roomId),
