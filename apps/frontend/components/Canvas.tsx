@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { ShapeButton } from "./ShapeButtton";
 import { Circle, Pencil, RectangleHorizontal } from "lucide-react";
 import { Toolbar } from "./Toolbar";
+import { Game } from "@/app/draw/Game";
 
 export enum SelectType {
   circle = "circle",
@@ -18,22 +19,27 @@ export const Canvas = ({
   socket: WebSocket;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [game, setGame] = useState<Game>();
   const [selectedTool, setSelectedTool] = useState<SelectType>(
     SelectType.circle
   );
 
   useEffect(() => {
-    //@ts-ignore
-    window.selectedTool = selectedTool;
-  }, [selectedTool]);
+    game?.setTool(selectedTool);
+  }, [selectedTool, game]);
 
   useEffect(() => {
     if (canvasRef.current) {
-      initDraw(canvasRef.current, roomId, socket);
+      const g = new Game(canvasRef.current, roomId, socket);
+      setGame(g);
+
+      return () => {
+        g.destroy();
+      };
     }
   }, [canvasRef]);
   return (
-    <div className="h-screen overflow-hidden">
+    <div className="relative h-screen overflow-hidden">
       <Toolbar selectedTool={selectedTool} setSelectedTool={setSelectedTool} />
       <canvas
         ref={canvasRef}

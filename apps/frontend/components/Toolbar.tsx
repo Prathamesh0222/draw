@@ -10,7 +10,7 @@ export const Toolbar = ({
   setSelectedTool: (s: SelectType) => void;
 }) => {
   return (
-    <div className="flex gap-2 m-4">
+    <div className="absolute flex gap-2 m-4">
       <ShapeButton
         activated={selectedTool === SelectType.circle}
         onClick={() => {
