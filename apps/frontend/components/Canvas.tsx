@@ -34,14 +34,15 @@ export const Canvas = ({
         g.destroy();
       };
     }
-  }, [canvasRef]);
+  }, [canvasRef, roomId, socket]);
+
   return (
     <div className="relative h-screen overflow-hidden">
       <Toolbar selectedTool={selectedTool} setSelectedTool={setSelectedTool} />
       <canvas
         ref={canvasRef}
         width={window.innerWidth}
-        height={window.innerHeight}
+        height={window.innerWidth}
       ></canvas>
     </div>
   );
