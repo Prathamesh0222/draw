@@ -5,6 +5,16 @@ import axios from "axios";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { HTTP_URL } from "@/config";
 
 type Room = {
   admin: {
@@ -17,12 +27,16 @@ type Room = {
 
 export default function Dashboard() {
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [createSpace, setCreateSpace] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const existingRooms = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3001/chats", {
+
+      const response = await axios.get(`${HTTP_URL}/chats`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -30,6 +44,31 @@ export default function Dashboard() {
       setRooms(response.data);
     } catch (error) {
       console.error("Error while fetching rooms", error);
+    }
+  };
+
+  const createRoom = async () => {
+    if (!createSpace.trim()) return;
+    setIsLoading(true);
+    const token = localStorage.getItem("token");
+
+    try {
+      await axios.post(
+        `${HTTP_URL}/room`,
+        {
+          name: createSpace,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setDialogOpen(false);
+      setCreateSpace("");
+      existingRooms();
+    } catch (error) {
+      console.error("Error creating room", error);
     }
   };
 
@@ -42,12 +81,35 @@ export default function Dashboard() {
       <nav className="p-5">
         <div className="flex justify-between">
           <h1 className="text-3xl font-bold">Drawing Room</h1>
-          <Button>
-            <Plus /> Create Room
-          </Button>
+          <Dialog
+            open={dialogOpen}
+            onOpenChange={(open) => {
+              setDialogOpen(open);
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button>
+                <Plus /> Create Room
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create Room</DialogTitle>
+                <DialogDescription>Give a name to your room</DialogDescription>
+              </DialogHeader>
+              <Input
+                placeholder="Enter room name"
+                value={createSpace}
+                onChange={(e) => setCreateSpace(e.target.value)}
+              />
+              <Button onClick={createRoom}>
+                {isLoading ? "Creating..." : "Create"}
+              </Button>
+            </DialogContent>
+          </Dialog>
         </div>
       </nav>
-      <div className="flex gap-4">
+      <div className="flex gap-4 justify-center mt-8">
         {rooms.map((room, idx) => (
           <div
             key={idx}
@@ -61,7 +123,7 @@ export default function Dashboard() {
               {new Date(room.createdAt).toLocaleDateString()}
             </div>
             <Button
-              className="w-full"
+              className="w-full mt-4"
               onClick={() => {
                 router.push(`/canvas/${room.id}`);
               }}
