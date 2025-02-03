@@ -17,11 +17,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { HTTP_URL, SIGNIN_IMG, SIGNUP_IMG } from "@/config";
+import { useRouter } from "next/navigation";
 
 type SigninInput = z.infer<typeof SigninSchema>;
 type SignupInput = z.infer<typeof SignupSchema>;
 
 export default function Auth({ isSignin }: { isSignin: boolean }) {
+  const router = useRouter();
   const schema = isSignin ? SigninSchema : SignupSchema;
   const defaultValues = isSignin
     ? { username: "", password: "" }
@@ -52,7 +54,12 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
     },
 
     onSuccess: (data) => {
-      console.log(data);
+      if (isSignin) {
+        localStorage.setItem("token", data.token);
+        router.push("/dashboard");
+      } else {
+        router.push("/signin");
+      }
     },
   });
 

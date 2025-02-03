@@ -166,6 +166,23 @@ app.get("/chats/:roomId", async (req, res) => {
   });
 });
 
+//@ts-ignore
+app.get("/chats", middleware, async (req: CustomRequest, res: Response) => {
+  const rooms = await prismaClient.room.findMany({
+    select: {
+      id: true,
+      slug: true,
+      createdAt: true,
+      admin: {
+        select: {
+          username: true,
+        },
+      },
+    },
+  });
+  res.status(200).json(rooms);
+});
+
 app.get("/room/:slug", async (req, res) => {
   const slug = req.params.slug;
   const room = await prismaClient.room.findFirst({

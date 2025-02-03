@@ -1,7 +1,4 @@
-import { initDraw } from "@/app/draw";
 import { useEffect, useRef, useState } from "react";
-import { ShapeButton } from "./ShapeButtton";
-import { Circle, Pencil, RectangleHorizontal } from "lucide-react";
 import { Toolbar } from "./Toolbar";
 import { Game } from "@/app/draw/Game";
 
