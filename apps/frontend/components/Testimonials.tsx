@@ -50,7 +50,7 @@ export const Testimonials = () => {
                 ))}
               </div>
               <p className="text-gray-300 mb-6 leading-relaxed">
-                "{testimonial.content}"
+                {testimonial.content}
               </p>
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-700 to-gray-600 flex items-center justify-center text-lg font-semibold">

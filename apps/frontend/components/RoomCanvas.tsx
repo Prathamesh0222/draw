@@ -20,7 +20,7 @@ export const RoomCanvas = ({ roomId }: { roomId: string }) => {
         })
       );
     };
-  }, []);
+  }, [roomId, token]);
 
   if (!socket) {
     return <div>Connecting to server....</div>;

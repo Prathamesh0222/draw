@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { HTTP_URL, SIGNIN_IMG, SIGNUP_IMG } from "@/config";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 type SigninInput = z.infer<typeof SigninSchema>;
 type SignupInput = z.infer<typeof SignupSchema>;
@@ -141,13 +142,13 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
       </div>
       <div className="h-screen">
         {isSignin ? (
-          <img
+          <Image
             src={SIGNIN_IMG}
             alt="DrawTopia Interface"
             className="object-cover h-full w-full"
           />
         ) : (
-          <img
+          <Image
             src={SIGNUP_IMG}
             alt="DrawTopia Interface"
             className="object-cover h-full w-full"

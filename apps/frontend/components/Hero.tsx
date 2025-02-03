@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { Button } from "./ui/button";
 import { LANDING_IMG } from "@/config";
+import Image from "next/image";
 
 export const Hero = () => {
   return (
@@ -28,7 +29,7 @@ export const Hero = () => {
           </div>
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg"></div>
-            <img
+            <Image
               src={LANDING_IMG}
               alt="DrawTopia Interface"
               className="rounded-lg shadow-2xl border border-white/10"
