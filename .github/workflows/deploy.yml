@@ -23,7 +23,7 @@ jobs:
           echo "PNPM is available: $(which pnpm)"
           echo "PM2 is available: $(which pm2)"
           nvm use node
-          ssh root@${{ secrets.DEPLOY_HOST }} << 'EOF'
+          ssh -i root@${{ secrets.DEPLOY_HOST }} << 'EOF'
             cd /path/to/your/project
             git pull
             pnpm install
