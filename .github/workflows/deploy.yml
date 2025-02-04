@@ -30,5 +30,6 @@ jobs:
             cd draw/
             git pull
             pnpm install
+            pnpm run build
             pm2 restart all
           EOF
