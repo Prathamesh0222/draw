@@ -9,6 +9,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
@@ -16,17 +19,15 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-          [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
-          echo "NVM is loaded: $(which nvm)"
-          echo "PNPM is available: $(which pnpm)"
-          echo "PM2 is available: $(which pm2)"
-          nvm use node
-          ssh -i root@${{ secrets.DEPLOY_HOST }} << 'EOF'
-            cd /path/to/your/project
-            git pull
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} << 'EOF'
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+            echo "NVM is loaded: $(which nvm)"
+            echo "PNPM is available: $(which pnpm)"
+            echo "PM2 is available: $(which pm2)"
+            nvm use node
+            cd draw/
             pnpm install
-            pnpm run build
             pm2 restart all
           EOF
