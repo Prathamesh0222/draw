@@ -15,20 +15,18 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy to Server
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: root
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
-            echo "NVM is loaded: $(which nvm)"
-            echo "PNPM is available: $(which pnpm)"
-            echo "PM2 is available: $(which pm2)"
-            nvm use node
-            cd draw/
+        run: |
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+          [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+          echo "NVM is loaded: $(which nvm)"
+          echo "PNPM is available: $(which pnpm)"
+          echo "PM2 is available: $(which pm2)"
+          nvm use node
+          ssh root@${{ secrets.DEPLOY_HOST }} << 'EOF'
+            cd /path/to/your/project
             git pull
             pnpm install
             pnpm run build
             pm2 restart all
+          EOF
