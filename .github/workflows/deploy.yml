@@ -9,29 +9,26 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy to Server
-        run: |
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-          [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
-          echo "NVM is loaded: $(which nvm)"
-          echo "PNPM is available: $(which pnpm)"
-          echo "PM2 is available: $(which pm2)"
-          nvm use node
-          ssh root@${{ secrets.DEPLOY_HOST }} << 'EOF'
-            cd /path/to/your/project
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+            echo "NVM is loaded: $(which nvm)"
+            echo "PNPM is available: $(which pnpm)"
+            echo "PM2 is available: $(which pm2)"
+            nvm use node
+            cd draw/
             git pull
             pnpm install
             pnpm run build
             pm2 restart all
-          EOF
