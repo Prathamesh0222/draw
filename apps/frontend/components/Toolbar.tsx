@@ -1,4 +1,4 @@
-import { Circle, Pencil, RectangleHorizontal } from "lucide-react";
+import { Circle, Pencil, RectangleHorizontal, Type } from "lucide-react";
 import { ShapeButton } from "./ShapeButtton";
 import { SelectType } from "./Canvas";
 
@@ -29,6 +29,11 @@ export const Toolbar = ({
         activated={selectedTool === SelectType.pencil}
         onClick={() => [setSelectedTool(SelectType.pencil)]}
         icon={<Pencil />}
+      />
+      <ShapeButton
+        activated={selectedTool === SelectType.text}
+        onClick={() => [setSelectedTool(SelectType.text)]}
+        icon={<Type />}
       />
     </div>
   );

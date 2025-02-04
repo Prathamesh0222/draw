@@ -19,6 +19,14 @@ type Shape =
       type: SelectType.pencil;
       points: Array<{ x: number; y: number }>;
       color: string;
+    }
+  | {
+      type: SelectType.text;
+      x: number;
+      y: number;
+      text: string;
+      fontSize: number;
+      color: string;
     };
 
 export class Game {
@@ -32,6 +40,7 @@ export class Game {
   private selectedTool: SelectType = SelectType.circle;
   private userClicked: boolean;
   private currentPath: Array<{ x: number; y: number }> = [];
+  private textArea: HTMLTextAreaElement | null = null;
 
   constructor(canvas: HTMLCanvasElement, roomId: string, socket: WebSocket) {
     this.canvas = canvas;
@@ -49,6 +58,84 @@ export class Game {
     this.canvas.removeEventListener("mousedown", this.mouseDownHandler);
     this.canvas.removeEventListener("mouseup", this.mouseUpHandler);
     this.canvas.removeEventListener("mousemove", this.mouseMoveHandler);
+    this.removeTextArea();
+  }
+
+  private createTextArea(x: number, y: number) {
+    this.removeTextArea();
+
+    const textArea = document.createElement("textarea");
+    textArea.style.position = "absolute";
+    textArea.style.left = `${x}px`;
+    textArea.style.top = `${y}px`;
+    textArea.style.backgroundColor = "transparent";
+    textArea.style.border = "none";
+    textArea.style.outline = "none";
+    textArea.style.padding = "0";
+    textArea.style.margin = "0";
+    textArea.style.overflow = "hidden";
+    textArea.style.resize = "none";
+    textArea.style.fontSize = "25px";
+    textArea.style.fontFamily = "Arial";
+    textArea.style.color = "white";
+    textArea.style.minWidth = "100px";
+    textArea.style.minHeight = "1em";
+
+    textArea.addEventListener("blur", () => this.handleTextSubmit(textArea));
+    textArea.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        textArea.blur();
+      }
+      if (e.key === "Escape") {
+        this.removeTextArea();
+      }
+    });
+
+    const canvasContainer = this.canvas.parentElement;
+    if (canvasContainer) {
+      canvasContainer.style.position = "relative";
+      canvasContainer.appendChild(textArea);
+      this.textArea = textArea;
+      textArea.focus();
+    }
+  }
+
+  private removeTextArea() {
+    if (this.textArea && this.textArea.parentElement) {
+      this.textArea.parentElement.removeChild(this.textArea);
+      this.textArea = null;
+    }
+  }
+
+  private handleTextSubmit(textArea: HTMLTextAreaElement) {
+    const text = textArea.value.trim();
+    if (text) {
+      const rect = this.canvas.getBoundingClientRect();
+      const x = parseFloat(textArea.style.left) - rect.left;
+      const y = parseFloat(textArea.style.top) - rect.top;
+      const shape: Shape = {
+        type: SelectType.text,
+        x,
+        y,
+        text,
+        fontSize: 25,
+        color: "white",
+      };
+
+      this.existingShapes.push(shape);
+      this.socket.send(
+        JSON.stringify({
+          type: "chat",
+          message: JSON.stringify({
+            shape,
+          }),
+          roomId: this.roomId,
+        })
+      );
+    }
+    this.removeTextArea();
+    this.clearCanvas();
   }
 
   setTool(shape: SelectType) {
@@ -90,7 +177,7 @@ export class Game {
         );
         this.ctx.stroke();
         this.ctx.closePath();
-      } else {
+      } else if (shape.type === SelectType.pencil) {
         if (shape.points.length < 2) return;
         this.ctx.beginPath();
         this.ctx.strokeStyle = shape.color;
@@ -106,6 +193,11 @@ export class Game {
 
         this.ctx.stroke();
         this.ctx.closePath();
+      } else if (shape.type === SelectType.text) {
+        this.ctx.font = `${shape.fontSize}px Arial`;
+        this.ctx.fillStyle = shape.color;
+        this.ctx.textBaseline = "top";
+        this.ctx.fillText(shape.text, shape.x, shape.y);
       }
     });
   }
@@ -153,6 +245,12 @@ export class Game {
           color: "rgba(255,255,255)",
         };
       }
+    } else if (selectedTool === SelectType.text) {
+      this.canvas.getBoundingClientRect();
+      const x = e.clientX;
+      const y = e.clientY;
+      this.createTextArea(x, y);
+      return;
     }
 
     if (!shape) {

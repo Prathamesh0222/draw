@@ -6,6 +6,7 @@ export enum SelectType {
   circle = "circle",
   rectangle = "rect",
   pencil = "pencil",
+  text = "text",
 }
 
 export const Canvas = ({
