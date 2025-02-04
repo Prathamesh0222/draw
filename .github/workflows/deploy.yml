@@ -20,29 +20,13 @@ jobs:
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} << 'EOF'
-            # Source necessary configuration files
-            if [ -f "$HOME/.bashrc" ]; then
-              . "$HOME/.bashrc"
-            fi
-
-            if [ -f "$HOME/.bash_profile" ]; then
-              . "$HOME/.bash_profile"
-            fi
-
-            # Ensure NVM is sourced and available
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
-
-            # Debugging outputs
             echo "NVM is loaded: $(which nvm)"
             echo "PNPM is available: $(which pnpm)"
             echo "PM2 is available: $(which pm2)"
-
-            # Switch to your Node.js version if needed
             nvm use node
-
-            # Deploy actions
             cd draw/
             pnpm install
             pm2 restart all
