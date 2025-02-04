@@ -18,4 +18,4 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy to Server
-        run: ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} "cd draw/ && source ~/.bashrc && npm install -g pnpm && git pull origin main && pnpm install && pnpm run build && pm2 restart all"
+        run: ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} "cd draw/ && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash && source ~/.bashrc && nvm install v22 && npm install -g pnpm && git pull origin main && pnpm install && pnpm run build && pm2 restart all"
