@@ -69,7 +69,7 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
   });
 
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
       <div className="flex flex-col justify-center max-w-7xl mx-32">
         <h1 className="text-3xl font-bold text-center mb-2">
           {isSignin ? "Login" : "Register"}
@@ -140,20 +140,14 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
           </a>
         </div>
       </div>
-      <div className="h-screen">
-        {isSignin ? (
-          <Image
-            src={SIGNIN_IMG}
-            alt="DrawTopia Interface"
-            className="object-cover h-full w-full"
-          />
-        ) : (
-          <Image
-            src={SIGNUP_IMG}
-            alt="DrawTopia Interface"
-            className="object-cover h-full w-full"
-          />
-        )}
+      <div className="h-screen hidden lg:block">
+        <Image
+          src={isSignin ? SIGNIN_IMG : SIGNUP_IMG}
+          width={1920}
+          height={1080}
+          alt="DrawTopia Interface"
+          className="object-cover h-full w-full"
+        />
       </div>
     </div>
   );

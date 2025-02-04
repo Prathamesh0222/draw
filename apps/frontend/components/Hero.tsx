@@ -31,6 +31,8 @@ export const Hero = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg"></div>
             <Image
               src={LANDING_IMG}
+              width={1920}
+              height={1080}
               alt="DrawTopia Interface"
               className="rounded-lg shadow-2xl border border-white/10"
             />
