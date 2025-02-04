@@ -15,8 +15,10 @@ type Room = {
 
 export const useRoom = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const existingRooms = async () => {
+    setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
 
@@ -26,10 +28,11 @@ export const useRoom = () => {
         },
       });
       setRooms(response.data);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error while fetching rooms", error);
     }
   };
 
-  return { setRooms, rooms, existingRooms };
+  return { setRooms, rooms, existingRooms, isLoading };
 };
