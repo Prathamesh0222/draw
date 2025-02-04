@@ -18,4 +18,27 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy to Server
-        run: ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} "cd draw/ && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash && source ~/.bashrc && nvm install v22 && npm install -g pnpm && git pull origin main && pnpm install && pnpm run build && pm2 restart all"
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} << 'EOF'
+            cd draw/
+            
+            # Install or Update NVM
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+            
+            # Load NVM in the current session
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+
+            # Install Node.js and Dependencies
+            nvm install v22
+            npm install -g pnpm
+
+            # Pull latest changes and build
+            git pull origin main
+            pnpm install
+            pnpm run build
+
+            # Restart the application
+            pm2 restart all
+          EOF
