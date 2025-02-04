@@ -28,6 +28,7 @@ jobs:
             echo "PM2 is available: $(which pm2)"
             nvm use node
             cd draw/
+            git pull
             pnpm install
             pm2 restart all
           EOF
