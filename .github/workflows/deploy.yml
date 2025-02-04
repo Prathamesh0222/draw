@@ -21,7 +21,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} << 'EOF'
             cd draw/
-            git pull origin main
             pnpm install
             pm2 restart all
           EOF
