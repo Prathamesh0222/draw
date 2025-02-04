@@ -21,14 +21,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} << 'EOF'
             cd draw/
-            
-            # Install or Update NVM
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
-            nvm install v22
-            npm install -g pnpm
             git pull origin main
             pnpm install
             pm2 restart all
