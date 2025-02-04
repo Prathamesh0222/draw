@@ -29,5 +29,7 @@ jobs:
             nvm use node
             cd draw/
             pnpm install
+            pm2 stop all
+            pnpm run build
             pm2 restart all
           EOF
