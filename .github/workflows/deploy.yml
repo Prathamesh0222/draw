@@ -20,6 +20,7 @@ jobs:
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} << 'EOF'
+            source ~/.bashrc
             cd draw/
             pnpm install
             pm2 restart all
