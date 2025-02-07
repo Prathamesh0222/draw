@@ -1,16 +1,30 @@
+"use client";
+
 import { ArrowRight } from "lucide-react";
 import { Button } from "./ui/button";
 import { LANDING_IMG } from "@/config";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 export const Hero = () => {
   return (
     <section className="relative pt-32 pb-20 overflow-hidden">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]"></div>
-      <div className="container mx-auto px-4">
+      <motion.div
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{
+          duration: 0.8,
+          delay: 0.5,
+          type: "spring",
+          damping: 10,
+          stiffness: 100,
+        }}
+        className="container mx-auto px-4"
+      >
         <div className="relative grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
-            <h1 className="text-6xl font-bold leading-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+            <h1 className="text-6xl font-bold">
               Collaborative Drawing Made Simple
             </h1>
             <p className="text-xl text-gray-400">
@@ -38,7 +52,7 @@ export const Hero = () => {
             />
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };

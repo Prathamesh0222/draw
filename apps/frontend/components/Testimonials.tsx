@@ -1,9 +1,28 @@
+"use client";
+
 import { Star } from "lucide-react";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 
 export const Testimonials = () => {
+  const testimonialRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(testimonialRef, { once: true });
+
   return (
     <section className="py-20 text-white">
-      <div className="container mx-auto px-4">
+      <motion.div
+        ref={testimonialRef}
+        initial={{ y: -50, opacity: 0 }}
+        animate={isInView ? { y: 0, opacity: 1 } : { y: -50, opacity: 0 }}
+        transition={{
+          duration: 0.9,
+          delay: 0.5,
+          type: "spring",
+          damping: 10,
+          stiffness: 100,
+        }}
+        className="container mx-auto px-4"
+      >
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
             What Users Say
@@ -65,7 +84,7 @@ export const Testimonials = () => {
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };
