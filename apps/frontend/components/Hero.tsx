@@ -36,9 +36,6 @@ export const Hero = () => {
               <Button size="lg">
                 Try Now <ArrowRight className="ml-2" />
               </Button>
-              <Button size="lg" variant="outline">
-                Watch Demo
-              </Button>
             </div>
           </div>
           <div className="relative">

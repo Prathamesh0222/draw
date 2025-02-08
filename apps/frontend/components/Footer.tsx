@@ -1,6 +1,26 @@
+"use client";
+
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
+
 export const Footer = () => {
+  const footerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(footerRef, { once: true });
+
   return (
-    <footer className="border-t border-white/10 py-12 mt-20 text-white">
+    <motion.footer
+      ref={footerRef}
+      initial={{ y: 50, opacity: 0 }}
+      animate={isInView ? { y: 0, opacity: 1 } : { y: -50, opacity: 0 }}
+      transition={{
+        duration: 0.8,
+        delay: 0.3,
+        type: "spring",
+        damping: 15,
+        stiffness: 100,
+      }}
+      className="border-t border-white/10 py-12 mt-20 text-white"
+    >
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
@@ -44,6 +64,6 @@ export const Footer = () => {
           <p>&copy; 2024 DrawTopia. All rights reserved.</p>
         </div>
       </div>
-    </footer>
+    </motion.footer>
   );
 };
