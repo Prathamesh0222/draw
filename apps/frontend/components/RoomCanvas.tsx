@@ -1,7 +1,5 @@
 "use client";
 
-import { WS_URL } from "@/config";
-import { useEffect, useState } from "react";
 import { Canvas } from "./Canvas";
 import { useSocket } from "@/app/hooks/useSocket";
 
