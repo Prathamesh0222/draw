@@ -10,10 +10,93 @@ import {
 } from "@repo/common/types";
 import bcrypt from "bcryptjs";
 import cors from "cors";
+import passport from "passport";
+import GoogleStrategy from "passport-google-oauth20";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+app.use(passport.initialize());
+
+const callbackURL = process.env.PROD_GOOGLE_URL;
+passport.use(
+  new GoogleStrategy.Strategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      callbackURL: callbackURL,
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        let user = await prismaClient.user.findFirst({
+          where: {
+            email:
+              profile.emails && profile.emails[0]
+                ? profile.emails[0].value
+                : undefined,
+          },
+        });
+
+        if (!user) {
+          user = await prismaClient.user.create({
+            data: {
+              email:
+                profile.emails && profile.emails[0]
+                  ? profile.emails[0].value
+                  : "",
+              username: profile.displayName,
+              password: "",
+            },
+          });
+        }
+        return done(null, user);
+      } catch (error) {
+        return done(error, false);
+      }
+    }
+  )
+);
+
+passport.serializeUser((user: any, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id: string, done) => {
+  try {
+    const user = await prismaClient.user.findUnique({ where: { id } });
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});
+
+app.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+app.get(
+  "/auth/google/callback",
+  passport.authenticate("google", { session: false }),
+  (req, res) => {
+    const user = req.user;
+    if (!user) {
+      return res.redirect("/login?error=Unauthorized");
+    }
+
+    const token = jwt.sign({ userId: (user as any).id }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    const PROD_URL = process.env.PROD_URL;
+
+    res.redirect(`${PROD_URL}/auth-success?token=${token}`);
+  }
+);
 
 app.post("/signup", async (req, res) => {
   try {
