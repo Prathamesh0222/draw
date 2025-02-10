@@ -34,7 +34,7 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
     defaultValues,
   });
 
-  const GoogleCLient = router.push(`${HTTP_URL}/auth/google`);
+  const GoogleClient = () => router.push(`${HTTP_URL}/auth/google`);
 
   const mutation = useMutation({
     mutationFn: async (data: SigninInput | SignupInput) => {
@@ -141,7 +141,7 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
             {isSignin ? "Signup" : "Signin"}
           </a>
         </div>
-        <Button onClick={() => GoogleCLient}>Sign in with Google</Button>
+        <Button onClick={GoogleClient}>Sign in with Google</Button>
       </div>
       <div className="h-screen hidden lg:block">
         <Image
