@@ -94,7 +94,7 @@ app.get(
 
     const PROD_URL = process.env.PROD_URL;
 
-    res.redirect(`${PROD_URL}/auth-success?token=${token}`);
+    res.redirect(`${PROD_URL}/dashboard/auth-success?token=${token}`);
   }
 );
 
