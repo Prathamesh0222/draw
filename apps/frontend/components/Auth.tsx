@@ -19,6 +19,7 @@ import { z } from "zod";
 import { HTTP_URL, SIGNIN_IMG, SIGNUP_IMG } from "@/config";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { signIn } from "next-auth/react";
 
 type SigninInput = z.infer<typeof SigninSchema>;
 type SignupInput = z.infer<typeof SignupSchema>;
@@ -34,7 +35,16 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
     defaultValues,
   });
 
-  const GoogleClient = () => router.push(`${HTTP_URL}/auth/google`);
+  const handleGoogleSignIn = async () => {
+    const result = await signIn("google", {
+      redirect: false,
+      callbackUrl: "/dashboard",
+    });
+
+    if (result?.ok) {
+      router.push("/dashboard");
+    }
+  };
 
   const mutation = useMutation({
     mutationFn: async (data: SigninInput | SignupInput) => {
@@ -141,7 +151,7 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
             {isSignin ? "Signup" : "Signin"}
           </a>
         </div>
-        <Button onClick={GoogleClient}>Sign in with Google</Button>
+        <Button onClick={handleGoogleSignIn}>Sign in with Google</Button>
       </div>
       <div className="h-screen hidden lg:block">
         <Image

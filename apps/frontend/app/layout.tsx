@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
+import { AuthProvider } from "@/provider/sessionProvider";
 
 const manrope = localFont({
   src: "./fonts/Manrope-VariableFont_wght.ttf",
@@ -25,7 +26,9 @@ export default function RootLayout({
         className={`${manrope.variable} antialiased`}
         suppressHydrationWarning
       >
+        <AuthProvider>
         <ThemeWrapper>{children}</ThemeWrapper>
+        </AuthProvider>
       </body>
     </html>
   );
