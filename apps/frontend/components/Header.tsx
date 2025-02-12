@@ -9,35 +9,62 @@ export const Header = () => {
   const router = useRouter();
   return (
     <motion.header
-      initial={{ y: -50, opacity: 0 }}
+      initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{
-        duration: 0.8,
-        delay: 0.2,
+        duration: 1,
         type: "spring",
-        damping: 10,
-        stiffness: 100,
+        damping: 15,
+        stiffness: 80,
       }}
-      className="fixed top-0 w-full z-50 border-b border-white/10 backdrop-blur-xl bg-black/30 text-white"
+      className="fixed top-0 w-full z-50 border-b border-white/20  backdrop-blur-2xl text-white shadow-2xl"
     >
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-8 py-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+          <motion.h1
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-2xl font-extrabold bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent cursor-pointer"
+          >
             DrawTopia
-          </h1>
-          <div className="flex items-center gap-4">
-            <a
+          </motion.h1>
+          <div className="flex items-center gap-8">
+            <motion.a
+              whileHover={{ scale: 1.1, rotate: 10 }}
+              whileTap={{ scale: 0.9 }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Button variant="ghost" size="icon">
-                <Github className="w-5 h-5" />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-red-500/20 hover:text-red-400 transition-all duration-300 ease-in-out"
+              >
+                <Github className="w-6 h-6" />
               </Button>
-            </a>
-            <Button onClick={() => router.push("/signin")}>
-              Start Drawing
-            </Button>
+            </motion.a>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Button
+                onClick={() => router.push("/signin")}
+                className="relative overflow-hidden group bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-semibold px-8 py-2.5 rounded-xl shadow-lg hover:shadow-red-600/30 transition-all duration-300"
+              >
+                <motion.span
+                  className="absolute inset-0 w-full h-full bg-gradient-to-r from-white/20 to-transparent"
+                  initial={{ x: "100%" }}
+                  whileHover={{ x: "-100%" }}
+                  transition={{ duration: 0.5 }}
+                />
+                <span className="relative">Start Drawing</span>
+              </Button>
+            </motion.div>
           </div>
         </div>
       </div>
