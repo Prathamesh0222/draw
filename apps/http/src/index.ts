@@ -11,7 +11,8 @@ import {
 import bcrypt from "bcryptjs";
 import cors from "cors";
 
-const app = express();
+export const app: express.Express = express();
+
 app.use(express.json());
 app.use(cors());
 
@@ -50,13 +51,13 @@ app.post("/signup", async (req, res) => {
       },
     });
 
-    res.json({
+    res.status(201).json({
       message: "User created successfully",
       status: 201,
     });
   } catch (error) {
     console.error(error);
-    res.json({
+    res.status(500).json({
       message: "Error creating user",
       status: 500,
     });
@@ -104,7 +105,8 @@ app.post("/signin", async (req, res) => {
       JWT_SECRET
     );
 
-    res.json({
+    res.status(200).json({
+      message: "User logged in successfully",
       token,
     });
   } catch (error) {
