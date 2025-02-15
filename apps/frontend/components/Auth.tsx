@@ -36,13 +36,13 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
   });
 
   const handleGoogleSignIn = async () => {
-    const result = await signIn("google", {
-      redirect: false,
-      callbackUrl: "/dashboard",
-    });
-
-    if (result?.ok) {
-      router.push("/dashboard");
+    try {
+      const result = await signIn("google", {
+        redirect: true,
+        callbackUrl: "/dashboard",
+      });
+    } catch (error) {
+      console.error("Google sign-in failed: ", error);
     }
   };
 
