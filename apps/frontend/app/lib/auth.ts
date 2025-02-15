@@ -2,7 +2,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { prismaClient } from "@repo/db/client";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import jwt from "jsonwebtoken";
-import { User } from "next-auth";
+import { NextAuthOptions, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import { Session } from "next-auth";
 
@@ -84,4 +84,4 @@ export const authOptions = {
     signIn: "/auth/signin",
     error: "/auth/error",
   },
-};
+} satisfies NextAuthOptions;

@@ -37,7 +37,7 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
 
   const handleGoogleSignIn = async () => {
     try {
-      const result = await signIn("google", {
+      await signIn("google", {
         redirect: true,
         callbackUrl: "/dashboard",
       });
