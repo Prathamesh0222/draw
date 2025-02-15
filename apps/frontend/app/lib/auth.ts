@@ -21,10 +21,10 @@ declare module "next-auth/jwt" {
   }
 }
 
-export const authOptions = {
-  secret: process.env.NEXTAUTH_SECRET,
+export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET! as string,
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
   },
   providers: [
     GoogleProvider({
@@ -84,4 +84,4 @@ export const authOptions = {
     signIn: "/auth/signin",
     error: "/auth/error",
   },
-} satisfies NextAuthOptions;
+};
