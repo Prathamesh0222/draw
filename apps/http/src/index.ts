@@ -10,14 +10,11 @@ import {
 } from "@repo/common/types";
 import bcrypt from "bcryptjs";
 import cors from "cors";
-import dotenv from "dotenv";
 import { uploads } from "./middlewares/cloudinary";
 
 export const app: Express = express();
 
-app.use(express.json());
 app.use(cors());
-dotenv.config();
 
 app.post("/signup", uploads.single("image"), async (req, res) => {
   try {
@@ -69,6 +66,8 @@ app.post("/signup", uploads.single("image"), async (req, res) => {
     });
   }
 });
+
+app.use(express.json());
 
 app.post("/signin", async (req, res) => {
   try {

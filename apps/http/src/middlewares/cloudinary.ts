@@ -1,4 +1,4 @@
-import { v2 as cloudinary, UploadApiOptions } from "cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import dotenv from "dotenv";
 import multer from "multer";
