@@ -1,7 +1,7 @@
 import express, { Request, Response, Express } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/backend-common/config";
-import { middleware } from "./middleware";
+import { middleware } from "./middlewares/middleware";
 import { prismaClient } from "@repo/db/client";
 import {
   CreateRoomSchema,
@@ -10,13 +10,16 @@ import {
 } from "@repo/common/types";
 import bcrypt from "bcryptjs";
 import cors from "cors";
+import dotenv from "dotenv";
+import { uploads } from "./middlewares/cloudinary";
 
 export const app: Express = express();
 
 app.use(express.json());
 app.use(cors());
+dotenv.config();
 
-app.post("/signup", async (req, res) => {
+app.post("/signup", uploads.single("image"), async (req, res) => {
   try {
     const parsedData = SignupSchema.safeParse(req.body);
     if (!parsedData.success) {
@@ -27,6 +30,7 @@ app.post("/signup", async (req, res) => {
     }
 
     const { email, password, username } = parsedData.data;
+    const imageUrl = req.file?.path;
 
     const existingUser = await prismaClient.user.findFirst({
       where: {
@@ -48,12 +52,14 @@ app.post("/signup", async (req, res) => {
         email,
         password: hashedPassword,
         username,
+        avatar: imageUrl || null,
       },
     });
 
     res.status(201).json({
       message: "User created successfully",
       status: 201,
+      image: imageUrl,
     });
   } catch (error) {
     console.error(error);
