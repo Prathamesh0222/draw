@@ -1,7 +1,7 @@
-import express, { Response } from "express";
+import express, { Request, Response, Express } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/backend-common/config";
-import { CustomRequest, middleware } from "./middleware";
+import { middleware } from "./middleware";
 import { prismaClient } from "@repo/db/client";
 import {
   CreateRoomSchema,
@@ -11,7 +11,7 @@ import {
 import bcrypt from "bcryptjs";
 import cors from "cors";
 
-export const app: express.Express = express();
+export const app: Express = express();
 
 app.use(express.json());
 app.use(cors());
@@ -118,8 +118,7 @@ app.post("/signin", async (req, res) => {
   }
 });
 
-//@ts-ignore
-app.post("/room", middleware, async (req: CustomRequest, res: Response) => {
+app.post("/room", middleware, async (req: Request, res: Response) => {
   const parsedData = CreateRoomSchema.safeParse(req.body);
   if (!parsedData.success) {
     res.json({
@@ -138,7 +137,7 @@ app.post("/room", middleware, async (req: CustomRequest, res: Response) => {
       },
     });
 
-    res.json({
+    res.status(200).json({
       roomId: room.id,
     });
   } catch (error) {
@@ -168,8 +167,7 @@ app.get("/chats/:roomId", async (req, res) => {
   });
 });
 
-//@ts-ignore
-app.get("/chats", middleware, async (req: CustomRequest, res: Response) => {
+app.get("/chats", middleware, async (req: Request, res: Response) => {
   const rooms = await prismaClient.room.findMany({
     select: {
       id: true,
