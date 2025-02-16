@@ -15,12 +15,13 @@ import { uploads } from "./middlewares/cloudinary";
 export const app: Express = express();
 
 app.use(cors());
+app.use(express.json());
 
 app.post("/signup", uploads.single("image"), async (req, res) => {
   try {
     const parsedData = SignupSchema.safeParse(req.body);
     if (!parsedData.success) {
-      res.json({
+      res.status(400).json({
         message: "Incorrect inputs",
       });
       return;
@@ -66,8 +67,6 @@ app.post("/signup", uploads.single("image"), async (req, res) => {
     });
   }
 });
-
-app.use(express.json());
 
 app.post("/signin", async (req, res) => {
   try {

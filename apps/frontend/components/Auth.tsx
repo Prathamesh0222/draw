@@ -22,14 +22,14 @@ import Image from "next/image";
 import { signIn } from "next-auth/react";
 
 type SigninInput = z.infer<typeof SigninSchema>;
-type SignupInput = z.infer<typeof SignupSchema>;
+type SignupInput = z.infer<typeof SignupSchema> & { avatar?: File };
 
 export default function Auth({ isSignin }: { isSignin: boolean }) {
   const router = useRouter();
   const schema = isSignin ? SigninSchema : SignupSchema;
   const defaultValues = isSignin
     ? { username: "", password: "" }
-    : { username: "", email: "", password: "" };
+    : { username: "", email: "", password: "", avatar: undefined };
   const form = useForm<SigninInput | SignupInput>({
     resolver: zodResolver(schema),
     defaultValues,
@@ -48,11 +48,18 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
 
   const mutation = useMutation({
     mutationFn: async (data: SigninInput | SignupInput) => {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (key === "avatar" && value instanceof File) {
+          formData.append("image", value);
+        } else if (typeof value === "string") {
+          formData.append(key, value);
+        }
+      });
       const endpoint = isSignin ? `${HTTP_URL}/signin` : `${HTTP_URL}/signup`;
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: formData,
       });
 
       if (!response.ok) {
@@ -103,7 +110,7 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-medium">
-                      Username
+                      Username<span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -117,25 +124,49 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
                 )}
               />
               {!isSignin && (
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">
-                        Email
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="abc@example.com"
-                          {...field}
-                          className="h-11 px-4 border-2 focus:ring-2 focus:ring-primary/50"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <>
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">
+                          Email<span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="abc@example.com"
+                            {...field}
+                            className="h-11 px-4 border-2 focus:ring-2 focus:ring-primary/50"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="avatar"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">
+                          Avatar
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) =>
+                              field.onChange(e.target.files?.[0])
+                            }
+                            className="h-11 px-4 border-2 border-dotted focus:ring-2 focus:ring-primary/50 cursor-pointer"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
               )}
               <FormField
                 control={form.control}
@@ -143,7 +174,7 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-medium">
-                      Password
+                      Password<span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
