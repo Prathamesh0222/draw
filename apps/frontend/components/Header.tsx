@@ -19,12 +19,12 @@ export const Header = () => {
       }}
       className="fixed top-0 w-full z-50 border-b border-white/20  backdrop-blur-2xl text-white shadow-2xl"
     >
-      <div className="container mx-auto px-8 py-6">
+      <div className="max-w-7xl mx-auto px-8 py-6">
         <div className="flex items-center justify-between">
           <motion.h1
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="text-2xl font-extrabold bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent cursor-pointer"
+            className="text-xl md:text-2xl font-extrabold bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent cursor-pointer"
           >
             DrawTopia
           </motion.h1>
@@ -42,7 +42,7 @@ export const Header = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="hover:bg-red-500/20 hover:text-red-400 transition-all duration-300 ease-in-out"
+                className="hidden md:block hover:bg-red-500/20 hover:text-red-400 transition-all duration-300 ease-in-out"
               >
                 <Github className="w-6 h-6" />
               </Button>
@@ -54,7 +54,7 @@ export const Header = () => {
             >
               <Button
                 onClick={() => router.push("/signin")}
-                className="relative overflow-hidden group bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-semibold px-8 py-2.5 rounded-xl shadow-lg hover:shadow-red-600/30 transition-all duration-300"
+                className="relative overflow-hidden group bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-semibold px-4 md:px-6 py-2 md:py-2.5 rounded-xl shadow-lg hover:shadow-red-600/30 transition-all duration-300 text-sm md:text-base"
               >
                 <motion.span
                   className="absolute inset-0 w-full h-full bg-gradient-to-r from-white/20 to-transparent"

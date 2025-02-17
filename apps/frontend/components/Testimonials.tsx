@@ -21,7 +21,7 @@ export const Testimonials = () => {
           damping: 10,
           stiffness: 100,
         }}
-        className="container mx-auto px-4"
+        className="max-w-7xl mx-auto px-4"
       >
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
@@ -58,7 +58,7 @@ export const Testimonials = () => {
           ].map((testimonial, i) => (
             <div
               key={i}
-              className="p-8 rounded-lg border border-white/10 bg-white/5 backdrop-blur-xl transition-all duration-300 hover:border-white/20"
+              className="p-8 rounded-2xl border border-white/10 backdrop-blur-xl transition-all duration-300 hover:border-white/20 bg-gradient-to-br from-white/10 to-transparent hover:shadow-2xl hover:shadow-red-500/20"
             >
               <div className="flex items-center gap-1 mb-6">
                 {[1, 2, 3, 4, 5].map((star) => (

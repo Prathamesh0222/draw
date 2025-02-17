@@ -19,7 +19,7 @@ export const Footer = () => {
         damping: 15,
         stiffness: 100,
       }}
-      className="border-t border-white/10 py-12 mt-20 text-white"
+      className="border-t border-white/10 py-8 mt-20 text-white"
     >
       <div className=" text-center text-gray-400">
         <p>&copy; 2025 DrawTopia. All rights reserved.</p>
