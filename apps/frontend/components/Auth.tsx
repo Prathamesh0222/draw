@@ -19,6 +19,7 @@ import { z } from "zod";
 import { HTTP_URL, SIGNIN_IMG, SIGNUP_IMG } from "@/config";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { signIn } from "next-auth/react";
 
 type SigninInput = z.infer<typeof SigninSchema>;
@@ -90,7 +91,16 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
       <div className="flex flex-col justify-center px-8 lg:px-16 xl:px-32 py-12 bg-gradient-to-b from-background to-secondary/20">
-        <div className="w-full max-w-md mx-auto space-y-8">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.5,
+            delay: 0.3,
+          }}
+          className="w-full max-w-md mx-auto space-y-8"
+        >
           <div className="space-y-2 text-center">
             <h1 className="text-4xl font-bold tracking-tight">
               {isSignin ? "Welcome Back" : "Create Account"}
@@ -248,7 +258,7 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
               {isSignin ? "Create an account" : "Sign in"}
             </a>
           </div>
-        </div>
+        </motion.div>
       </div>
       <div className="relative hidden lg:block">
         <Image

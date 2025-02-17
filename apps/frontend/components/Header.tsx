@@ -42,7 +42,7 @@ export const Header = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="hidden md:block hover:bg-red-500/20 hover:text-red-400 transition-all duration-300 ease-in-out"
+                className="hidden md:block hover:bg-red-500/20 hover:text-red-400 transition-all duration-300 ease-in-out pl-3"
               >
                 <Github className="w-6 h-6" />
               </Button>
