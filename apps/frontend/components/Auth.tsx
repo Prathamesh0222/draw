@@ -49,27 +49,47 @@ export default function Auth({ isSignin }: { isSignin: boolean }) {
 
   const mutation = useMutation({
     mutationFn: async (data: SigninInput | SignupInput) => {
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (key === "avatar" && value instanceof File) {
-          formData.append("image", value);
-        } else if (typeof value === "string") {
-          formData.append(key, value);
-        }
-      });
       const endpoint = isSignin ? `${HTTP_URL}/signin` : `${HTTP_URL}/signup`;
-      const response = await fetch(endpoint, {
-        method: "POST",
-        body: formData,
-      });
 
-      if (!response.ok) {
-        throw new Error("Something went wrong");
+      if (isSignin) {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: data.username,
+            password: data.password,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Signin failed");
+        }
+        return response.json();
+      } else {
+        const formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => {
+          if (key === "avatar" && value instanceof File) {
+            formData.append("image", value);
+          } else if (typeof value === "string") {
+            formData.append(key, value);
+          }
+        });
+
+        const response = await fetch(endpoint, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Something went wrong");
+        }
+
+        return response.json();
       }
-
-      return response.json();
     },
-
     onError: (error) => {
       console.error(error);
     },
