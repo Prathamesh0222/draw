@@ -8,12 +8,14 @@ type Shape =
       y: number;
       width: number;
       height: number;
+      color: string;
     }
   | {
       type: SelectType.circle;
       centerX: number;
       centerY: number;
       radius: number;
+      color: string;
     }
   | {
       type: SelectType.pencil;
@@ -41,17 +43,28 @@ export class Game {
   private userClicked: boolean;
   private currentPath: Array<{ x: number; y: number }> = [];
   private textArea: HTMLTextAreaElement | null = null;
+  private color: string;
 
-  constructor(canvas: HTMLCanvasElement, roomId: string, socket: WebSocket) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    roomId: string,
+    socket: WebSocket,
+    initialColor: string
+  ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.existingShapes = [];
     this.roomId = roomId;
     this.socket = socket;
     this.userClicked = false;
+    this.color = initialColor;
     this.init();
     this.initHandlers();
     this.initMouseHandlers();
+  }
+
+  setColor(color: string) {
+    this.color = color;
   }
 
   destroy() {
@@ -77,7 +90,7 @@ export class Game {
     textArea.style.resize = "none";
     textArea.style.fontSize = "25px";
     textArea.style.fontFamily = "Arial";
-    textArea.style.color = "white";
+    textArea.style.color = this.color;
     textArea.style.minWidth = "100px";
     textArea.style.minHeight = "1em";
 
@@ -120,7 +133,7 @@ export class Game {
         y,
         text,
         fontSize: 25,
-        color: "white",
+        color: this.color,
       };
 
       this.existingShapes.push(shape);
@@ -160,11 +173,11 @@ export class Game {
 
   clearCanvas() {
     this.ctx?.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.existingShapes.map((shape) => {
+    this.existingShapes.forEach((shape) => {
+      this.ctx.strokeStyle = shape.color;
+      this.ctx.fillStyle = shape.color;
+      this.ctx.lineWidth = 2;
       if (shape.type === SelectType.rectangle) {
-        if (this.ctx) {
-          this.ctx.strokeStyle = "rgba(255,255,255)";
-        }
         this.ctx?.strokeRect(shape.x, shape.y, shape.width, shape.height);
       } else if (shape.type === SelectType.circle) {
         this.ctx.beginPath();
@@ -179,8 +192,6 @@ export class Game {
         this.ctx.closePath();
       } else if (shape.type === SelectType.pencil) {
         if (shape.points.length < 2) return;
-        this.ctx.beginPath();
-        this.ctx.strokeStyle = shape.color;
         this.ctx.lineWidth = 2;
         this.ctx.lineCap = "round";
         this.ctx.lineJoin = "round";
@@ -195,7 +206,6 @@ export class Game {
         this.ctx.closePath();
       } else if (shape.type === SelectType.text) {
         this.ctx.font = `${shape.fontSize}px Arial`;
-        this.ctx.fillStyle = shape.color;
         this.ctx.textBaseline = "top";
         this.ctx.fillText(shape.text, shape.x, shape.y);
       }
@@ -228,6 +238,7 @@ export class Game {
         y: this.startY,
         width,
         height,
+        color: this.color,
       };
     } else if (selectedTool === SelectType.circle) {
       const radius = Math.max(width, height) / 2;
@@ -236,13 +247,14 @@ export class Game {
         radius: radius,
         centerX: this.startX + radius,
         centerY: this.startY + radius,
+        color: this.color,
       };
     } else if (selectedTool === SelectType.pencil) {
       if (this.currentPath.length > 0) {
         shape = {
           type: SelectType.pencil,
           points: this.currentPath,
-          color: "rgba(255,255,255)",
+          color: this.color,
         };
       }
     } else if (selectedTool === SelectType.text) {
@@ -280,7 +292,7 @@ export class Game {
       this.currentPath.push({ x, y });
 
       this.ctx.beginPath();
-      this.ctx.strokeStyle = "rgba(255,255,255)";
+      this.ctx.strokeStyle = this.color;
       this.ctx.lineWidth = 2;
       this.ctx.lineCap = "round";
       this.ctx.lineJoin = "round";
@@ -296,9 +308,8 @@ export class Game {
         const width = e.clientX - this.startX;
         const height = e.clientY - this.startY;
         this.clearCanvas();
-        if (this.ctx) {
-          this.ctx.strokeStyle = "rgba(255,255,255)";
-        }
+        this.ctx.strokeStyle = this.color;
+        this.ctx.lineWidth = 2;
         const selectedTool = this.selectedTool;
         if (selectedTool === SelectType.rectangle) {
           this.ctx?.strokeRect(this.startX, this.startY, width, height);

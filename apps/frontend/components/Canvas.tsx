@@ -18,6 +18,7 @@ export const Canvas = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [game, setGame] = useState<Game>();
+  const [color, setColor] = useState("#FFFFFF");
   const [selectedTool, setSelectedTool] = useState<SelectType>(
     SelectType.circle
   );
@@ -27,8 +28,14 @@ export const Canvas = ({
   }, [selectedTool, game]);
 
   useEffect(() => {
+    if (game) {
+      game.setColor(color);
+    }
+  }, [color, game]);
+
+  useEffect(() => {
     if (canvasRef.current) {
-      const g = new Game(canvasRef.current, roomId, socket);
+      const g = new Game(canvasRef.current, roomId, socket, color);
       setGame(g);
 
       return () => {
@@ -39,11 +46,17 @@ export const Canvas = ({
 
   return (
     <div className="relative h-screen overflow-hidden">
-      <Toolbar selectedTool={selectedTool} setSelectedTool={setSelectedTool} />
+      <Toolbar
+        color={color}
+        setColor={setColor}
+        selectedTool={selectedTool}
+        setSelectedTool={setSelectedTool}
+      />
       <canvas
         ref={canvasRef}
         width={window.innerWidth}
         height={window.innerWidth}
+        className="bg-neutral-900"
       ></canvas>
     </div>
   );

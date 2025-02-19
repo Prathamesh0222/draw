@@ -14,7 +14,7 @@ export const ShapeButton = ({
     <div>
       <Button
         variant={"ghost"}
-        className={`rounded-full p-3 ${activated ? "text-red-500 bg-accent-foreground/10 hover:text-red-500" : "text-white hover:text-red-500"}`}
+        className={`p-2 rounded-md hover:bg-white/20 transition-colors3 ${activated ? "bg-white/20" : "bg-transparent"}`}
         onClick={onClick}
       >
         {icon}
